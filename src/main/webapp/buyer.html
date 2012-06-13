@@ -1,0 +1,16 @@
+<lift:surround with="default" at="content">
+    <lift:EditBuyer form="post">
+        <table>
+            <tr><th>Příjmení a jméno</th><td><input:name/></td></tr>
+            <tr><th>Email</th><td><input:email/></td></tr>
+            <tr><th>Ulož</th><td><input:submit/></td></tr>
+        </table>
+    </lift:EditBuyer>
+    <lift:AllBuyers>
+        <table>
+            <objects:list>
+                <tr><th><object:name/></th><td><object:edit><a>Editovat</a></object:edit></td></tr>
+            </objects:list>
+        </table>
+    </lift:AllBuyers>
+</lift:surround>

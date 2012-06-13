@@ -1,0 +1,5 @@
+mail.smtp.host=smtp.seznam.cz
+mail.password=numlock
+mail.debug=true
+mail.user=ryskajakub@seznam.cz
+mail.smtp.auth=true

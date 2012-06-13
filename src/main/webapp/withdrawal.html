@@ -1,0 +1,18 @@
+<lift:surround with="default" at="content">
+    <lift:Withdraw form="post">
+        <withdraw:input>
+            <table>
+                <tr><th>Prodávající</th><td><input:seller/></td></tr>
+                <tr><th>Částka</th><td><input:amount/></td></tr>
+                <tr><th></th><td><input:submit/></td></tr>
+            </table>
+        </withdraw:input>
+        <table>
+            <tr><th>Prodávající</th><th>Částka</th><th>Datum</th></tr>
+            <withdraw:list>
+                <tr><td><list:seller/></td><td><list:amount/></td><td><list:date/></td></tr>
+            </withdraw:list>
+        </table>
+    </lift:Withdraw>
+</lift:surround>
+

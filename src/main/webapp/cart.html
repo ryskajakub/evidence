@@ -1,0 +1,107 @@
+<lift:surround with="default" at="content">
+    <script type="text/javascript" src="js/cart.js"/>
+    <ul id="cartMenu">
+        <li id="searchByCodeMenu"><a class="active" href="javascript://">Vyhledat podle kódu</a></li>
+        <!--
+        <li id="searchByCategoryMenu"><a href="javascript://">Vyhledat podle kategorie</a></li>
+        -->
+        <li id="searchByNameMenu"><a href="javascript://">Vyhledat podle názvu</a></li>
+    </ul>
+    <lift:Cart>
+        <input:resultPattern>
+            <table class="result">
+                <result:row>
+                    <tr>
+                        <td>
+                            <row:name>
+                                <a href="javascript://"/>
+                            </row:name>
+                        </td>
+                        <td>
+                            <row:code/>
+                        </td>
+                        <td>
+                            <row:price/>
+                        </td>
+                        <row:stock>
+                            <td/>
+                        </row:stock>
+                    </tr>
+                </result:row>
+            </table>
+        </input:resultPattern>
+        <div id="contents">
+            <div id="searchByCode" class="active">
+                Kód:
+                <input:code>
+                    <input id="codeInput" type="text"/>
+                    <a id="codeInputClick" href="#">Přidat</a>
+                </input:code>
+                <div id="codeContent"/>
+            </div>
+            <div id="searchByCategory">
+                Kategorie:
+                <input:category>
+                    <input type="text"/>
+                </input:category>
+                <div id="categoryContent"/>
+            </div>
+            <div id="searchByName">
+                Název:
+                <input:name>
+                    <input type="text"/>
+                </input:name>
+                <div id="nameContent"/>
+            </div>
+        </div>
+        <ul id="cart">
+            <input:cart>
+                <div id="cartTable">
+                    <h3>Košík:</h3>
+                    <table>
+                        <items:repeat>
+                            <tr>
+                                <td>
+                                    <item:name/>
+                                </td>
+                                <td>
+                                    <item:count/>
+                                </td>
+                                <td>
+                                    <item:price/>
+                                </td>
+                                <td>
+                                    <item:remove>
+                                        <a href="javascript://">X</a>
+                                    </item:remove>
+                                </td>
+                            </tr>
+                        </items:repeat>
+                        <tr>
+                            <td colspan="2">
+                                Součet
+                            </td>
+                            <th>
+                                <items:total/>
+                            </th>
+                            <td/>
+                        </tr>
+                    </table>
+                    <ul>
+                        <li>
+                            <a href="/sell/cash">
+                                Prodej hotově
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/sell/transfer">
+                                Prodej převodem
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </input:cart>
+        </ul>
+    </lift:Cart>
+</lift:surround>
+

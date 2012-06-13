@@ -1,0 +1,16 @@
+<lift:surround with="default" at="content">
+    <lift:EditShopOwner form="post">
+        <table>
+            <tr><th>Jméno</th><td><input:name/></td></tr>
+            <tr><th>Heslo</th><td><input:password/></td></tr>
+            <tr><th>Ulož</th><td><input:submit/></td></tr>
+        </table>
+    </lift:EditShopOwner>
+    <lift:AllShopOwners>
+        <table>
+            <objects:list>
+                <tr><th><object:name/></th><td><object:edit><a>Editovat</a></object:edit></td></tr>
+            </objects:list>
+        </table>
+    </lift:AllShopOwners>
+</lift:surround>

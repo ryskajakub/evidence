@@ -1,0 +1,40 @@
+<lift:surround with="default" at="content">
+    <lift:EditItem form="post">
+        <input:message>
+            <p><message:content/></p>
+        </input:message>
+        Editovat
+        <table>
+            <tr><th>Zboží</th><td><input:title/></td></tr>
+            <tr><th>Kategorie</th><td><input:category id="category"/></td></tr>
+            <tr><th>Cena</th><td><input:price/></td></tr>
+            <tr><th>Kód</th><td><input:code/></td></tr>
+            <tr><th>Ulož</th><td><input:submit/></td></tr>
+        </table>
+        <ul>
+            <input:addings>
+                <li><strong>Počet:</strong><adding:count/> <strong>Poznámka:</strong><adding:note/></li>
+            </input:addings>
+        </ul>
+        <input:add>
+            Přidat
+            <table>
+                <tr><th>Množství</th><td><item:count/></td></tr>
+                <tr><th>Poznámka</th><td><item:note/></td></tr>
+                <tr><th>Přidej</th><td><item:add/></td></tr>
+            </table>
+        </input:add>
+    </lift:EditItem>
+    <lift:AllItems>
+        <table>
+            <objects:list>
+                <tr>
+                    <th><object:name/></th>
+                    <td><object:code/></td>
+                    <td><object:edit>Editovat &amp; naskladnit</object:edit></td>
+                </tr>
+            </objects:list>
+        </table>
+    </lift:AllItems>
+</lift:surround>
+

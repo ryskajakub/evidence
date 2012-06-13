@@ -1,0 +1,18 @@
+<lift:surround with="default" at="content">
+    <table>
+        <lift:Transfers form="post">
+            <tr><th>Prodávající</th><th>Datum</th><th>Kupující</th><th>Cena</th><th>Změnit stav</th><th>Stav</th></tr>
+            <one:transfers>
+                <tr>
+                    <td><transfer:seller/></td>
+                    <td><transfer:date/></td>
+                    <td><transfer:buyer/></td>
+                    <td><transfer:total/></td>
+                    <td><transfer:tick/></td>
+                    <td><transfer:state/></td>
+                </tr>
+            </one:transfers>
+            <one:submit/>
+        </lift:Transfers>
+    </table>
+</lift:surround>

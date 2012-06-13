@@ -1,0 +1,39 @@
+<lift:surround with="default" at="content">
+    <lift:Sell form="post">
+        <input:message>
+            <div id="message"/>
+        </input:message>
+        <strong>Celkem:</strong><span id="totalPrice"><input:total/></span><br/>
+        Najdi kupujícího:
+        <ul>
+            <li>
+                Jméno:
+                <input:searchPerson>
+                    <input id="buyer"/>
+                </input:searchPerson>
+            </li>
+            <li>
+                Email:
+                <input:searchedEmail>
+                    <span id="email"/>
+                </input:searchedEmail>
+            </li>
+        </ul>
+        Nebo nový kupující:
+        <ul>
+            <li>
+                Jméno:<input:newPerson/>
+            </li>
+            <li>
+                Email:<input:newEmail/>
+            </li>
+        </ul>
+        <input:counter>
+            Přijato:
+            <input id="moneyAmount"/><br/>
+            Vrátit:
+            <span id="repay"/>
+        </input:counter>
+        <input:ok/>
+    </lift:Sell>
+</lift:surround>

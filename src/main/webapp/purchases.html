@@ -1,0 +1,31 @@
+<lift:surround with="default" at="content">
+    <table id="purchasesTable">
+        <tr class="headerRow">
+            <th>Datum</th>
+            <th>Prodejce</th>
+            <th>Kupující</th>
+            <th>Zboží</th>
+            <th>Počet</th>
+            <th>Cena</th>
+            <th>Celková cena</th>
+        </tr>
+        <lift:Purchases>
+            <tbody>
+            <tr>
+                <td class="date"/>
+                <td class="seller"/>
+                <td class="buyer"/>
+                <td class="item"/>
+                <td class="count"/>
+                <td class="price"/>
+                <td class="total"/>
+            </tr>
+            <tr class="other">
+                <td class="item2"/>
+                <td class="count2"/>
+                <td class="price2"/>
+            </tr>
+            </tbody>
+        </lift:Purchases>
+    </table>
+</lift:surround>
