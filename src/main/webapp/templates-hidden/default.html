@@ -33,7 +33,7 @@
                     var moneyAmount = $new("#moneyAmount").val();
                     var totalPrice = $new("#totalPrice").html();
                     var diff = totalPrice - moneyAmount
-                    diff = (diff < 0) ? -diff : "to nestačí";
+                    diff = (diff <= 0) ? -diff : "to nestačí";
                     if(moneyAmount == ""){
                         diff = "";
                     }

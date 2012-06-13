@@ -65,7 +65,7 @@ object Cart {
   def render(xhtml: NodeSeq) = {
     var resultPattern = NodeSeq.Empty
     var cartPattern = NodeSeq.Empty
-    var onEnterFun : () => JsCmd = () => JsCmds.Noop
+    var onEnterFun: () => JsCmd = () => JsCmds.Noop
     def makeNodeSeq(results: List[Item], div: String) = {
       val res = Helpers.bind(
         "result",
@@ -118,18 +118,22 @@ object Cart {
             () =>
               DBStorer.getItemByCode(x) match {
                 case Full(item) =>
-                  CartVar.add(item)
-                  Replace("cartTable", applyCart(cartPattern))
+                  if (item.count - CartVar.count(item) > 0) {
+                    CartVar.add(item)
+                    Replace("cartTable", applyCart(cartPattern))
+                  } else {
+                    JsCmds.Noop
+                  }
                 case _ =>
                   JsCmds.Noop
               }
           }
           JsCmds.Noop
         }) &
-        "a [onclick]" #> SHtml.onEvent((x: String) => {
-          onEnterFun()
-        })
-      }  ,
+          "a [onclick]" #> SHtml.onEvent((x: String) => {
+            onEnterFun()
+          })
+      },
       "category" -%> {
         "input" #> SHtml.onEvents("onkeyup") {
           (input: String) =>
@@ -207,13 +211,13 @@ object MyMailer {
     val myRecips: List[String] = List(buyer.email)
     val plainContent: String =
       "Ahoj, bylo ti prodáno toto zboží:\n" +
-        CartVar.get.distinct.map(_.title).mkString("\n") +
+        CartVar.get.distinct.map(_.title).mkString("\n") + "\n" +
         "Uhraď prosím částku " + CartVar.total + " na komunitní účet: 1021034503 / 5500.\n" +
-        "Děkuje ti Yellow Gakyil a " + seller.name + ".\n"
+        "Děkuje ti Yellow Gakyil a " + seller.name + "."
     val myRecipsTo = myRecips.map(To(_))
 
     Mailer.sendMail(From("ryskajakub@seznam.cz"), Subject("Dzogchen dharmashop"),
-      (PlainMailBodyType(plainContent) :: myRecipsTo): _*)
+      (PlainPlusBodyType(plainContent, "UTF-8") :: myRecipsTo): _*)
   }
 }
 
@@ -269,7 +273,7 @@ object Withdraw {
       xhtml,
       "input" -%> {
         (seq: NodeSeq) => {
-          if (LoggedSeller.get.isDefined) {
+          if (LoggedAdmin.get.isDefined) {
             Helpers.bind(
               "input",
               seq,
@@ -430,7 +434,10 @@ class EditItem(in: Item) {
       "category" -%> SHtml.text(in.category, (x) => item = item.copy(category = x)),
       "code" -%> SHtml.text(in.code, (x) => item = item.copy(code = x)),
       "price" -%> SHtml.text(in.price.toString, (x) => item = item.copy(price = x.trim.toInt)),
-      "submit" -%> SHtml.submit("OK", () => DBStorer.saveItem(item)),
+      "submit" -%> SHtml.submit("OK", () => {
+        DBStorer.saveItem(item)
+        S.redirectTo(Boot.newItem.toLoc.calcHref(item))
+      }),
       "add" -%> {
         (xhtml2: NodeSeq) =>
           item.id match {
@@ -462,7 +469,12 @@ class EditBuyer(in: Buyer) {
       xhtml,
       "name" -%> SHtml.text(in.name, (x) => buyer = buyer.copy(name = x)),
       "email" -%> SHtml.text(in.email, (x) => buyer = buyer.copy(email = x)),
-      "submit" -%> SHtml.submit("OK", () => DBStorer.saveBuyer(buyer))
+      "submit" -%> SHtml.submit("OK",
+        () => {
+          DBStorer.saveBuyer(buyer)
+          S.redirectTo(Boot.newBuyer.toLoc.calcHref(buyer))
+        }
+      )
     )
   }
 }
@@ -512,15 +524,19 @@ class Sell(x: String) {
           JsCmds.Replace("email", res)
         }),
       "newPerson" -%> SHtml.text("", (x) => {
-        newPerson.copy(name = x)
+        newPerson = newPerson.copy(name = x)
       }),
       "newEmail" -%> SHtml.text("", (x) => {
-        newPerson.copy(email = x)
+        newPerson = newPerson.copy(email = x)
       }),
       "message" -%> Text(message),
       "counter" -%> ((x) => if (cash) x else NodeSeq.Empty),
       "ok" -%> SHtml.submit("Prodej", () => {
-        val choosenBuyer = if (newPerson.isEmpty) buyer else newPerson
+        val choosenBuyer = if (newPerson.isEmpty) {
+          buyer
+        } else {
+          DBStorer.saveBuyer(newPerson)
+        }
         (LoggedSeller.get, choosenBuyer) match {
           case (Full(seller), buyer1) if seller.isValid && buyer1.isValid =>
             DBStorer.sell(CartVar.get, seller, buyer1, if (cash) 0 else 1)
@@ -528,6 +544,7 @@ class Sell(x: String) {
               MyMailer.sendMail(seller, buyer)
             }
             CartVar.clear()
+            S.redirectTo(Boot.cart.toMenu.loc.calcDefaultHref)
           case _ =>
         }
       })

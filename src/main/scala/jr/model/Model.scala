@@ -13,6 +13,7 @@ import java.util.{Date, Properties}
 case class Item(id: Int = 0, title: String = "", category: String = "", owner: Int = 0, price: Int = 0,
                 code: String = "") {
   def count = DBStorer.countAdded(id) - DBStorer.countSold(id)
+
   def getAddings = {
     DBStorer.getAddings(id)
   }
@@ -31,23 +32,29 @@ case class Buyer(id: Int = 0, name: String = "", email: String = "") {
   }
 }
 
-case class ItemAdd(count:Int, note:String, date:Date)
+case class ItemAdd(count: Int, note: String, date: Date)
 
-trait ShopOwner{
+trait ShopOwner {
   def id: Int
+
   def name: String
+
   def password: String
+
   def isAdmin: Boolean
 }
 
-case class RealShopOwner(id:Int = 0, name:String = "", password:String = "") extends ShopOwner {
+case class RealShopOwner(id: Int = 0, name: String = "", password: String = "") extends ShopOwner {
   def isAdmin = false
 }
 
 case object Admin extends ShopOwner {
   def id = 0
+
   def name = "admin"
+
   def password = "admin"
+
   def isAdmin = true
 }
 
@@ -90,7 +97,7 @@ object DBStorer {
 
   def getCategoryByLike(s: String) = {
     queryRunner.query("select distinct category from ev_item where category like ?",
-    funToResultSetHandlerMany(queryString), "%" + s + "%")
+      funToResultSetHandlerMany(queryString), "%" + s + "%")
   }
 
   def getBuyerByFullName(name: String): Box[Buyer] = {
@@ -103,7 +110,7 @@ object DBStorer {
       funToResultSetHandlerMany(queryString), "%" + value + "%")
   }
 
-  def tick(unpaied: Set[Purchase],paied: Set[Purchase]) {
+  def tick(unpaied: Set[Purchase], paied: Set[Purchase]) {
     unpaied.foreach((x: Purchase) => {
       queryRunner.update(
         """
@@ -231,7 +238,7 @@ object DBStorer {
   }
 
   def queryString: (ResultSet) => String = {
-    (x:ResultSet) => x.getString(1)
+    (x: ResultSet) => x.getString(1)
   }
 
   def queryShopOwner: (ResultSet) => ShopOwner = {
@@ -239,9 +246,10 @@ object DBStorer {
       val id = x.getInt(1)
       val name = x.getString(2)
       val password = x.getString(3)
-      RealShopOwner(id,name, password)
+      RealShopOwner(id, name, password)
     }
   }
+
   val queryAdding =
     (x: ResultSet) => {
       val count = x.getInt(1)
@@ -301,43 +309,50 @@ object DBStorer {
   }
 
   def saveSeller(seller: Seller) {
-    if (getSeller(seller.id.toString).isDefined) {
-      queryRunner.update(
-        "update ev_seller set name = ?, password = ?, balance = ? where seller_id = ?",
-        seller.name, seller.password, seller.balance.asInstanceOf[AnyRef], seller.id.asInstanceOf[AnyRef]
-      )
-    } else {
-      queryRunner.update(
-        "insert into ev_seller(name, password, balance) values (?,?,?)",
-        seller.name, seller.password, seller.balance.asInstanceOf[AnyRef]
-      )
+    if (getOwnerByName(seller.name).isEmpty && seller.name != "admin") {
+      if (getSeller(seller.id.toString).isDefined) {
+        queryRunner.update(
+          "update ev_seller set name = ?, password = ?, balance = ? where seller_id = ?",
+          seller.name, seller.password, seller.balance.asInstanceOf[AnyRef], seller.id.asInstanceOf[AnyRef]
+        )
+      } else {
+        queryRunner.update(
+          "insert into ev_seller(name, password, balance) values (?,?,?)",
+          seller.name, seller.password, seller.balance.asInstanceOf[AnyRef]
+        )
+      }
     }
   }
 
   def saveOwner(owner: RealShopOwner) {
-    if (getShopOwner(owner.id.toString).isDefined) {
-      queryRunner.update(
-        "update ev_shop_owner set name = ?, password = ?, balance = ? where seller_id = ?",
-        owner.name, owner.password, owner.id.asInstanceOf[AnyRef]
-      )
-    } else {
-      queryRunner.update(
-        "insert into ev_shop_owner(name, password) values (?,?)",
-        owner.name, owner.password
-      )
+    if (getSellerByName(owner.name).isEmpty && owner.name != "admin") {
+      if (getShopOwner(owner.id.toString).isDefined) {
+        queryRunner.update(
+          "update ev_shop_owner set name = ?, password = ?, balance = ? where seller_id = ?",
+          owner.name, owner.password, owner.id.asInstanceOf[AnyRef]
+        )
+      } else {
+        queryRunner.update(
+          "insert into ev_shop_owner(name, password) values (?,?)",
+          owner.name, owner.password
+        )
+      }
     }
   }
 
-  def saveBuyer(buyer: Buyer) {
+  def saveBuyer(buyer: Buyer): Buyer = {
     if (getBuyer(buyer.id.toString).isDefined) {
       queryRunner.update(
         "update ev_buyer set name = ?, email = ? where buyer_id = ?",
         buyer.name, buyer.email, buyer.id.asInstanceOf[AnyRef])
+      buyer
     } else {
       queryRunner.update(
         "insert into ev_buyer(name,email) values (?,?)",
         buyer.name, buyer.email
       )
+      val buyerId = queryRunner.query("select LAST_INSERT_ID()", funToResultSetHandler((rs: ResultSet) => rs.getInt(1)))
+      getBuyer(buyerId.get.toString).get
     }
   }
 
@@ -393,7 +408,7 @@ object DBStorer {
   }
 
 
-  def getOwnerByName(s: String):Box[ShopOwner] = {
+  def getOwnerByName(s: String): Box[ShopOwner] = {
     queryRunner.query("select shop_owner_id, name, password from ev_shop_owner where name = ?",
       funToResultSetHandler(queryShopOwner), s)
   }
@@ -418,7 +433,7 @@ object DBStorer {
       funToResultSetHandlerMany(queryShopOwner))
   }
 
-  def getShopOwner(s: String):Box[ShopOwner] = {
+  def getShopOwner(s: String): Box[ShopOwner] = {
     queryRunner.query("select shop_owner_id, name, password from ev_shop_owner where shop_owner_id = " + s,
       funToResultSetHandler(queryShopOwner))
   }
@@ -442,7 +457,7 @@ object DBStorer {
   val Tables = List( """
     ev_item (
       item_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(1000),
+      title VARCHAR(1000) UNIQUE,
       category VARCHAR(1000),
       shop_owner_id INTEGER UNSIGNED,
       code VARCHAR(50) UNIQUE
@@ -468,7 +483,7 @@ object DBStorer {
     """
       ev_seller (
         seller_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(1000),
+        name VARCHAR(1000) UNIQUE,
         password VARCHAR(1000),
         balance INTEGER
       )
@@ -477,7 +492,7 @@ object DBStorer {
       ev_buyer (
         buyer_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(1000),
-        name VARCHAR(1000)
+        name VARCHAR(1000) UNIQUE
       )
     """,
     //case class SellerHistory(id: Int, sellerId: Int, text: String)
@@ -521,7 +536,7 @@ object DBStorer {
     """
       ev_shop_owner(
         shop_owner_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(1000),
+        name VARCHAR(1000) UNIQUE,
         password VARCHAR(1000)
       )
     """
@@ -582,12 +597,12 @@ object DBStorer {
     }
   }
 
-  def login(name:String, password:String): Box[Either[Seller,ShopOwner]] = {
+  def login(name: String, password: String): Box[Either[Seller, ShopOwner]] = {
     val sellerByName = getSellerByName(name)
     val ownerByName = getOwnerByName(name)
     val res = (sellerByName, ownerByName) match {
-      case (Full(seller),_) if seller.password == password => Full(Left(seller))
-      case (_,Full(owner)) if owner.password == password => Full(Right(owner))
+      case (Full(seller), _) if seller.password == password => Full(Left(seller))
+      case (_, Full(owner)) if owner.password == password => Full(Right(owner))
       case _ if name == "admin" && password == "admin" => Full(Right(Admin))
       case _ => Empty
     }
