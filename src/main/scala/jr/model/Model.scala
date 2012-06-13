@@ -91,10 +91,6 @@ object DBStorer {
       funToResultSetHandlerMany(queryAdding), i.asInstanceOf[AnyRef])
   }
 
-  def getItemsByCodeLike(s: String) = {
-
-  }
-
   def getCategoryByLike(s: String) = {
     queryRunner.query("select distinct category from ev_item where category like ?",
       funToResultSetHandlerMany(queryString), "%" + s + "%")
@@ -457,7 +453,7 @@ object DBStorer {
   val Tables = List( """
     ev_item (
       item_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(1000) UNIQUE,
+      title VARCHAR(200) UNIQUE,
       category VARCHAR(1000),
       shop_owner_id INTEGER UNSIGNED,
       code VARCHAR(50) UNIQUE
@@ -483,7 +479,7 @@ object DBStorer {
     """
       ev_seller (
         seller_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(1000) UNIQUE,
+        name VARCHAR(200) UNIQUE,
         password VARCHAR(1000),
         balance INTEGER
       )
@@ -492,7 +488,7 @@ object DBStorer {
       ev_buyer (
         buyer_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(1000),
-        name VARCHAR(1000) UNIQUE
+        name VARCHAR(200) UNIQUE
       )
     """,
     //case class SellerHistory(id: Int, sellerId: Int, text: String)
@@ -536,7 +532,7 @@ object DBStorer {
     """
       ev_shop_owner(
         shop_owner_id INTEGER UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(1000) UNIQUE,
+        name VARCHAR(200) UNIQUE,
         password VARCHAR(1000)
       )
     """

@@ -10,6 +10,9 @@ import net.liftweb.sitemap.Loc
 import net.liftweb.http.{RequestVar, S, SessionVar, SHtml}
 import net.liftweb.http.js.JsCmds.Replace
 import net.liftweb.http.js.{JsCmd, JsCmds}
+import java.util.Date
+import java.util.logging.SimpleFormatter
+import java.text.SimpleDateFormat
 
 object CartVar extends SessionVar[List[Item]](List()) {
   def clear() {
@@ -489,7 +492,10 @@ class EditShopOwner(in: RealShopOwner) {
       xhtml,
       "name" -%> SHtml.text(in.name, (x) => shopOwner = shopOwner.copy(name = x)),
       "password" -%> SHtml.text(in.password, (x) => shopOwner = shopOwner.copy(password = x)),
-      "submit" -%> SHtml.submit("OK", () => DBStorer.saveOwner(shopOwner))
+      "submit" -%> SHtml.submit("OK", () => {
+        DBStorer.saveOwner(shopOwner)
+        S.redirectTo(Boot.shopOwner.toLoc.calcHref(in))
+      })
     )
   }
 }
@@ -628,7 +634,7 @@ object Evidence {
   def render(xhtml: NodeSeq) = {
     val groupedItems: Map[String, List[Item]] = DBStorer.allItem.groupBy((item: Item) => item.category)
     val eithers: List[Either[String, Item]] =
-      groupedItems.toList.map {
+      Left("Datum: " + (new SimpleDateFormat("dd.MM.yyyy")).format(new Date())) ::groupedItems.toList.map {
         case (category, items) => Left(category) :: items.map(Right(_))
       }.flatten
     val size = 3
