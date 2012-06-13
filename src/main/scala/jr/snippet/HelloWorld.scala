@@ -257,55 +257,6 @@ object Transfers {
   }
 }
 
-object Withdrawals {
-  def render(xhtml: NodeSeq) = {
-    val admin = LoggedSeller.get.isEmpty
-    Helpers.bind(
-      "w",
-      xhtml,
-      "seller" -%> {
-        (text: NodeSeq) => if (admin) text else NodeSeq.Empty
-      },
-      "repeat" -%> {
-        (text: NodeSeq) => {
-          val withdrawals = DBStorer.allWithdawals
-          val filtered = if (admin) withdrawals
-          else {
-            withdrawals.filter(w => {
-              val seller = LoggedSeller.get
-              (w.seller, seller) match {
-                case (Full(one), Full(two)) if (one.id == two.id) => true
-                case _ => false
-              }
-            })
-          }
-          filtered.flatMap {
-            (w) => {
-              Helpers.bind(
-                "one",
-                text,
-                "date" -%> Text(w.date.toString),
-                "amount" -%> Text(w.amount.toString),
-                "seller" -%> ((xml: NodeSeq) => {
-                  if (admin) {
-                    Helpers.bind(
-                      "seller",
-                      xml,
-                      "bind" -%> Text(w.seller.map(_.name).getOrElse("n/a"))
-                    )
-                  } else {
-                    NodeSeq.Empty
-                  }
-                })
-              )
-            }
-          }
-        }
-      }
-    )
-  }
-}
-
 object Withdraw {
   def render(xhtml: NodeSeq) = {
     var seller: Seller = null

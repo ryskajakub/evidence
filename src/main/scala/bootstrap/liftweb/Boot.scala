@@ -80,8 +80,8 @@ class Boot {
     // where to search snippet
     LiftRules.addToPackages("jr")
     // Build SiteMap
-    val entries = index :: newItem :: newBuyer :: newSeller :: cart :: shopOwner :: sell ::
-      purchases :: withdraw :: balance :: transfers :: /*withdrawals ::*/ about :: evidence :: Nil
+    val entries = index :: newItem :: newBuyer :: newSeller :: cart :: sell ::
+      purchases :: withdraw :: balance :: transfers :: about :: evidence :: Nil
     LiftRules.setSiteMap(SiteMap(entries: _*))
   }
 
