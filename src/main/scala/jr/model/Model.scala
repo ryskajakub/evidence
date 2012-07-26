@@ -213,11 +213,11 @@ object DBStorer {
 
   Class.forName("com.mysql.jdbc.Driver")
   val props = new Properties
-  props.setProperty("user", "crm")
-  props.setProperty("password", "crm")
+  props.setProperty("user", "jaku5_glassfish")
+  props.setProperty("password", "mGZbDuJjVj")
   props.setProperty("characterEncoding", "UTF-8")
   props.setProperty("characterSetResults", "UTF-8")
-  val url = "jdbc:mysql://localhost:3306/crm"
+  val url = "jdbc:mysql://10.0.0.1:3306/jakubryska_name_glassfish"
   val connectionFactory = new DriverManagerConnectionFactory(url, props)
   val connectionPool = new GenericObjectPool(null);
   val poolableFactory = new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true)
